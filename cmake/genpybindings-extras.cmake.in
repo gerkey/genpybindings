@@ -54,7 +54,9 @@ macro(_generate_srv_pybindings ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_O
 
   set(MSG_GENERATED_NAME ${MSG_SHORT_NAME}.cpp)
   set(GEN_OUTPUT_FILES 
-    ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}Request.cpp ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}Response.cpp
+    ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}.cpp 
+    ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}Request.cpp 
+    ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}Response.cpp
     )
 
   assert(CATKIN_ENV)
