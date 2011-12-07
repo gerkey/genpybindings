@@ -22,17 +22,16 @@ macro(_generate_msg_pybindings ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_O
   #Create input and output filenames
   get_filename_component(MSG_NAME ${ARG_MSG} NAME)
   get_filename_component(MSG_SHORT_NAME ${ARG_MSG} NAME_WE)
-  set(MSG_INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${ARG_MSG})
 
   set(MSG_GENERATED_NAME ${MSG_SHORT_NAME}.cpp)
   set(GEN_OUTPUT_FILE ${ARG_GEN_OUTPUT_DIR}/${MSG_GENERATED_NAME})
 
   assert(CATKIN_ENV)
   add_custom_command(OUTPUT ${GEN_OUTPUT_FILE}
-    DEPENDS ${GENPYBINDINGS_BIN} ${MSG_INPUT_FILE} ${ARG_MSG_DEPS}
+    DEPENDS ${GENPYBINDINGS_BIN} ${ARG_MSG} ${ARG_MSG_DEPS}
     ${GENPYBINDINGS_TEMPLATE_DIR}/msg.cpp.template
     ${GENPYBINDINGS_TEMPLATE_DIR}/srv.cpp.template
-    COMMAND ${CATKIN_ENV} ${GENPYBINDINGS_BIN} ${MSG_INPUT_FILE}
+    COMMAND ${CATKIN_ENV} ${GENPYBINDINGS_BIN} ${ARG_MSG}
     ${ARG_IFLAGS}
     -p ${ARG_PKG}
     -o ${ARG_GEN_OUTPUT_DIR}
@@ -50,7 +49,6 @@ macro(_generate_srv_pybindings ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_O
   #Create input and output filenames
   get_filename_component(MSG_NAME ${ARG_MSG} NAME)
   get_filename_component(MSG_SHORT_NAME ${ARG_MSG} NAME_WE)
-  set(MSG_INPUT_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${ARG_MSG})
 
   set(MSG_GENERATED_NAME ${MSG_SHORT_NAME}.cpp)
   set(GEN_OUTPUT_FILES 
@@ -61,10 +59,10 @@ macro(_generate_srv_pybindings ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_O
 
   assert(CATKIN_ENV)
   add_custom_command(OUTPUT ${GEN_OUTPUT_FILES}
-    DEPENDS ${GENPYBINDINGS_BIN} ${MSG_INPUT_FILE} ${ARG_MSG_DEPS}
+    DEPENDS ${GENPYBINDINGS_BIN} ${ARG_MSG} ${ARG_MSG_DEPS}
     ${GENPYBINDINGS_TEMPLATE_DIR}/msg.cpp.template
     ${GENPYBINDINGS_TEMPLATE_DIR}/srv.cpp.template
-    COMMAND ${CATKIN_ENV} ${GENPYBINDINGS_BIN} ${MSG_INPUT_FILE}
+    COMMAND ${CATKIN_ENV} ${GENPYBINDINGS_BIN} ${ARG_MSG}
     ${ARG_IFLAGS}
     -p ${ARG_PKG}
     -o ${ARG_GEN_OUTPUT_DIR}
