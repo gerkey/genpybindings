@@ -116,7 +116,7 @@ macro(_generate_module_pybindings ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES
     PREFIX "")
 
   add_dependencies(${boost_lib_target} ${ARG_PKG}_gencpp)
-  target_link_libraries(${boost_lib_target} ${Boost_LIBRARIES} ${ROS_LIBRARIES})
+  target_link_libraries(${boost_lib_target} ${Boost_LIBRARIES} ${ROS_LIBRARIES} ${PYTHON_LIBRARIES})
 
 endmacro()
 
