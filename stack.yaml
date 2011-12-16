@@ -1,5 +1,5 @@
 Package: genpybindings
-Version: 0.0.1
+Version: 0.0.2
 Section: misc
 Priority: extra
 Architecture: any
@@ -16,3 +16,7 @@ Catkin-CopyrightType:  willowgarage
 Catkin-Depends: catkin, genmsg, roscpp_core
 Catkin-ROS-Message-Generator: pybindings
 Catkin-DebRulesType: cmake
+
+Release-Pull: git://github.com/wg-debs/genpybindings.git
+Release-Push: git@github.com:wg-debs/genpybindings.git
+
