@@ -1,19 +1,13 @@
-Package: genpybindings
+Catkin-ProjectName: genpybindings
 Version: 0.0.2
-Section: misc
-Priority: extra
-Architecture: any
-Depends: python-empy, cmake, @(PackagePrefix)genmsg, @(PackagePrefix)catkin, libboost-python-dev
-Build-Depends: cmake, make, python, python-empy, libboost-python-dev,
-               @(PackagePrefix)catkin, @(PackagePrefix)genmsg,
 Description: Willow Garage low level build system macros and infrastructure
 Author: Troy Straszheim <straszheim@willowgarage.com>, Morten Kjaergaard
 Maintainer: Troy Straszheim <straszheim@willowgarage.com>
 Homepage: http://www.ros.org
 
-Catkin-ProjectName: genpybindings
+Depends: catkin, genmsg, roscpp_core, libboost-python-dev
+
 Catkin-CopyrightType:  willowgarage
-Catkin-Depends: catkin, genmsg, roscpp_core
 Catkin-ROS-Message-Generator: pybindings
 Catkin-DebRulesType: cmake
 
