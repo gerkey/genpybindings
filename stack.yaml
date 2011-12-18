@@ -5,7 +5,7 @@ Author: Troy Straszheim <straszheim@willowgarage.com>, Morten Kjaergaard
 Maintainer: Troy Straszheim <straszheim@willowgarage.com>
 Homepage: http://www.ros.org
 
-Depends: catkin, genmsg, roscpp_core, libboost-python-dev
+Depends: catkin, genmsg, libboost-python-dev
 
 Catkin-CopyrightType:  willowgarage
 Catkin-ROS-Message-Generator: pybindings
