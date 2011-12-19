@@ -51,9 +51,9 @@ macro(_generate_srv_pybindings ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_O
   get_filename_component(MSG_SHORT_NAME ${ARG_MSG} NAME_WE)
 
   set(MSG_GENERATED_NAME ${MSG_SHORT_NAME}.cpp)
-  set(GEN_OUTPUT_FILES 
-    ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}.cpp 
-    ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}Request.cpp 
+  set(GEN_OUTPUT_FILES
+    ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}.cpp
+    ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}Request.cpp
     ${ARG_GEN_OUTPUT_DIR}/${MSG_SHORT_NAME}Response.cpp
     )
 
@@ -83,7 +83,7 @@ macro(_generate_module_pybindings ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES
   #   export_MSG2();
   # }
 
-  find_package(ROS REQUIRED COMPONENTS 
+  find_package(ROS REQUIRED COMPONENTS
     cpp_common roscpp_serialization rostime roscpp_traits)
 
   include_directories(${ROS_INCLUDE_DIRS})
@@ -103,17 +103,19 @@ macro(_generate_module_pybindings ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES
     )
 
   # rule to put __init__.py into build dir
-  file(COPY ${GENPYBINDINGS_TEMPLATE_DIR}/__init__.py 
+  file(COPY ${GENPYBINDINGS_TEMPLATE_DIR}/__init__.py
     DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${ARG_PKG}
     )
 
   # build module
-  set(boost_lib_target "${ARG_PKG}/msg")
+  set(boost_lib_target "${ARG_PKG}-pybindings-module")
 
   file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${ARG_PKG})
   add_library(${boost_lib_target} SHARED ${ARG_GENERATED_FILES} ${GEN_OUTPUT_FILE})
-  set_target_properties(${boost_lib_target} PROPERTIES 
-    PREFIX "")
+  set_target_properties(${boost_lib_target} PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "${ARG_PKG}/msg"
+    )
 
   add_dependencies(${boost_lib_target} ${ARG_PKG}_gencpp)
   target_link_libraries(${boost_lib_target} ${Boost_LIBRARIES} ${ROS_LIBRARIES})
