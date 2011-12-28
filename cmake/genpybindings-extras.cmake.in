@@ -8,10 +8,13 @@ include_directories(${PYTHON_INCLUDE_PATH})
 include_directories(${CMAKE_BINARY_DIR}/gen/cpp)
 
 if(@PACKAGE_NAME@_SOURCE_DIR)
-  find_program_required(GENPYBINDINGS_BIN gen_pybindings.py PATHS ${@PACKAGE_NAME@_SOURCE_DIR}/scripts)
+  find_program_required(GENPYBINDINGS_BIN gen_pybindings.py
+    PATHS ${@PACKAGE_NAME@_SOURCE_DIR}/scripts)
   set(GENPYBINDINGS_TEMPLATE_DIR ${@PACKAGE_NAME@_SOURCE_DIR}/scripts)
 else()
-  find_program_required(GENPYBINDINGS_BIN gen_pybindings.py)
+  find_program_required(GENPYBINDINGS_BIN gen_pybindings.py
+    PATHS @CMAKE_INSTALL_PREFIX@/share/genpybindings/bin
+    )
   set(GENPYBINDINGS_TEMPLATE_DIR ${CMAKE_INSTALL_PREFIX}/share/genpybindings)
 endif()
 
@@ -31,7 +34,7 @@ macro(_generate_msg_pybindings ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_O
     DEPENDS ${GENPYBINDINGS_BIN} ${ARG_MSG} ${ARG_MSG_DEPS}
     ${GENPYBINDINGS_TEMPLATE_DIR}/msg.cpp.template
     ${GENPYBINDINGS_TEMPLATE_DIR}/srv.cpp.template
-    COMMAND ${CATKIN_ENV} ${GENPYBINDINGS_BIN} ${ARG_MSG}
+    COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENPYBINDINGS_BIN} ${ARG_MSG}
     ${ARG_IFLAGS}
     -p ${ARG_PKG}
     -o ${ARG_GEN_OUTPUT_DIR}
@@ -62,7 +65,7 @@ macro(_generate_srv_pybindings ARG_PKG ARG_MSG ARG_IFLAGS ARG_MSG_DEPS ARG_GEN_O
     DEPENDS ${GENPYBINDINGS_BIN} ${ARG_MSG} ${ARG_MSG_DEPS}
     ${GENPYBINDINGS_TEMPLATE_DIR}/msg.cpp.template
     ${GENPYBINDINGS_TEMPLATE_DIR}/srv.cpp.template
-    COMMAND ${CATKIN_ENV} ${GENPYBINDINGS_BIN} ${ARG_MSG}
+    COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENPYBINDINGS_BIN} ${ARG_MSG}
     ${ARG_IFLAGS}
     -p ${ARG_PKG}
     -o ${ARG_GEN_OUTPUT_DIR}
@@ -94,7 +97,7 @@ macro(_generate_module_pybindings ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES
   add_custom_command(OUTPUT ${GEN_OUTPUT_FILE}
     DEPENDS ${GENPYBINDINGS_BIN} ${ARG_GENERATED_FILES} ${ARG_MSG_DEPS}
     ${GENPYBINDINGS_TEMPLATE_DIR}/module.cpp.template
-    COMMAND ${CATKIN_ENV} ${GENPYBINDINGS_BIN}
+    COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENPYBINDINGS_BIN}
     -m
     -p ${ARG_PKG}
     -o ${ARG_GEN_OUTPUT_DIR}
@@ -103,22 +106,26 @@ macro(_generate_module_pybindings ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES
     )
 
   # rule to put __init__.py into build dir
+  file(MAKE_DIRECTORY lib/${ARG_PKG})
   file(COPY ${GENPYBINDINGS_TEMPLATE_DIR}/__init__.py
-    DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${ARG_PKG}
+    DESTINATION lib/${ARG_PKG}
     )
-
+  install(FILES ${GENPYBINDINGS_TEMPLATE_DIR}/__init__.py
+    DESTINATION lib/${ARG_PKG}
+    )
   # build module
   set(boost_lib_target "${ARG_PKG}-pybindings-module")
 
-  file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${ARG_PKG})
   add_library(${boost_lib_target} SHARED ${ARG_GENERATED_FILES} ${GEN_OUTPUT_FILE})
   set_target_properties(${boost_lib_target} PROPERTIES
     PREFIX ""
-    OUTPUT_NAME "${ARG_PKG}/msg"
+    OUTPUT_NAME msg
+    LIBRARY_OUTPUT_DIRECTORY lib/${ARG_PKG}
     )
 
   add_dependencies(${boost_lib_target} ${ARG_PKG}_gencpp)
   target_link_libraries(${boost_lib_target} ${Boost_LIBRARIES} ${ROS_LIBRARIES})
+  install(TARGETS ${boost_lib_target} LIBRARY DESTINATION lib/${ARG_PKG})
 
 endmacro()
 
