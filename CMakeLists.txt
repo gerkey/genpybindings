@@ -5,7 +5,7 @@ find_package(catkin)
 
 add_subdirectory(scripts)
 
-install_cmake_infrastructure(genpybindings
+catkin_project(genpybindings
   VERSION 0.0.0
   CFG_EXTRAS genpybindings-extras.cmake
   )
