@@ -15,4 +15,3 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/genpybindings
   DESTINATION etc/langs
   )
 
-catkin_package(genpybindings)
