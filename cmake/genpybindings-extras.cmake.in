@@ -3,19 +3,17 @@
 # On lucid (cmake 2.8.0) the boost_python escapes to other
 # link lines and causes errors.
 #
-function(find_boost_python)
+if(GENPYBINDINGS_EXTRAS_INCLUDED)
+  return()
+endif()
+set(GENPYBINDINGS_EXTRAS_INCLUDED TRUE)
+
+function(find_genpybinding_deps)
   find_package(Boost COMPONENTS python)
   set(BOOST_PYTHON_LIBRARY ${Boost_LIBRARIES} PARENT_SCOPE)
+  find_package(PythonLibs)
 endfunction()
-find_boost_python()
-
-include_directories(${Boost_INCLUDE_DIRS})
-
-find_package(PythonLibs)
-include_directories(${PYTHON_INCLUDE_PATH})
-
-#Make sure we can find buildspace generated messages
-include_directories(${CMAKE_BINARY_DIR}/gen/cpp)
+find_genpybinding_deps()
 
 if(@PACKAGE_NAME@_SOURCE_DIR)
   find_program_required(GENPYBINDINGS_BIN gen_pybindings.py
@@ -115,6 +113,7 @@ macro(_generate_module_pybindings ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES
     COMMENT "Generating boost::python module for ${ARG_PKG}"
     )
 
+  list(APPEND ALL_GEN_OUTPUT_FILES_pybindings ${GEN_OUTPUT_FILE})
   # rule to put __init__.py into build dir
   file(MAKE_DIRECTORY lib/${ARG_PKG})
   file(COPY ${GENPYBINDINGS_TEMPLATE_DIR}/__init__.py
@@ -124,18 +123,42 @@ macro(_generate_module_pybindings ARG_PKG ARG_GEN_OUTPUT_DIR ARG_GENERATED_FILES
     DESTINATION lib/${ARG_PKG}
     )
   # build module
-  set(boost_lib_target "${ARG_PKG}-pybindings-module")
+  set(boost_lib_target "${ARG_PKG}_pybindings_module")
 
-  add_library(${boost_lib_target} SHARED ${ARG_GENERATED_FILES} ${GEN_OUTPUT_FILE})
-  set_target_properties(${boost_lib_target} PROPERTIES
-    PREFIX ""
-    OUTPUT_NAME msg
-    LIBRARY_OUTPUT_DIRECTORY lib/${ARG_PKG}
+  #
+  # Well this is kinda awful, but works.  Manufacture a subdirectory
+  # to ensure that the include_directories is scoped and doesn't
+  # infect other targets.
+  #
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pybindings-src)
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/pybindings-src/CMakeLists.txt "
+
+    set_source_files_properties(${ALL_GEN_OUTPUT_FILES_pybindings}
+      PROPERTIES
+      GENERATED TRUE
+      )
+
+    include_directories(
+      ${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_PATH} ${CMAKE_BINARY_DIR}/gen/cpp)
+
+    add_library(${boost_lib_target} SHARED ${ARG_GENERATED_FILES} ${GEN_OUTPUT_FILE})
+    set_target_properties(${boost_lib_target} PROPERTIES
+      PREFIX \"\"
+      OUTPUT_NAME msg
+      LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/${ARG_PKG}
+      )
+
+    add_dependencies(${boost_lib_target} ${ARG_PKG}_gencpp)
+    target_link_libraries(${boost_lib_target}
+      ${BOOST_PYTHON_LIBRARY} ${ROS_LIBRARIES}
+      )
+
+    install(TARGETS ${boost_lib_target} LIBRARY DESTINATION lib/${ARG_PKG})
+")
+
+  add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/pybindings-src
+    ${CMAKE_CURRENT_BINARY_DIR}/pybindings
     )
-
-  add_dependencies(${boost_lib_target} ${ARG_PKG}_gencpp)
-  target_link_libraries(${boost_lib_target} ${BOOST_PYTHON_LIBRARIES} ${ROS_LIBRARIES})
-  install(TARGETS ${boost_lib_target} LIBRARY DESTINATION lib/${ARG_PKG})
 
 endmacro()
 
