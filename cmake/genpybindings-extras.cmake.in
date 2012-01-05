@@ -10,8 +10,8 @@ set(GENPYBINDINGS_EXTRAS_INCLUDED TRUE)
 
 function(find_genpybinding_deps)
   find_package(Boost COMPONENTS python)
-  set(BOOST_PYTHON_LIBRARY ${Boost_LIBRARIES} PARENT_SCOPE)
   find_package(PythonLibs)
+  set(BOOST_PYTHON_LIBRARY ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} PARENT_SCOPE)
 endfunction()
 find_genpybinding_deps()
 
